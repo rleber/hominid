@@ -8,6 +8,8 @@ module Hominid
       if defined?(Rails.root) && (!config || config.empty?)
         config = YAML.load(File.open("#{Rails.root}/config/hominid.yml"))[Rails.env].symbolize_keys
       end
+      config ||= {}
+      config[:api_key] ||= @@api_key
       api_endpoint = config[:api_key].split('-').last
       config.merge(:username => config[:username].to_s, :password => config[:password].to_s)
       defaults = {:send_welcome       => false,
@@ -26,6 +28,10 @@ module Hominid
 
     # Security related methods
     # --------------------------------
+
+    def self.api_key=(value)
+      @@api_key=value
+    end
 
     def add_api_key
       @chimpApi.call("apikeyAdd", *@config.values_at(:username, :password, :api_key))
